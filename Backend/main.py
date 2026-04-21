@@ -5,6 +5,9 @@ from schema import HealthInput
 from database import get_db, Prediction
 from sqlalchemy.orm import Session
 import json
+from auth import SECRET_KEY, create_token
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from jose import jwt
 
 app = FastAPI()
 
@@ -17,6 +20,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+security = HTTPBearer()
+
+def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    token = credentials.credentials
+    payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+    return payload
 
 @app.get("/")
 def home():
@@ -78,3 +87,24 @@ def delete_prediction(id: int, db: Session = Depends(get_db)):
         return {"message": "Deleted successfully"}
 
     return {"error": "Not found"}
+
+#authentication end point
+fake_users = []
+
+@app.post("/login")
+def login(data: dict):
+    for u in fake_users:
+        if u["email"] == data["email"] and u["password"] == data["password"]:
+            token = create_token({"email": u["email"]})
+            return {"access_token": token}
+    return {"error": "Invalid login"}
+
+#this is just a dummy register end point, in real application you should use proper database and hashing for passwords
+@app.post("/register")
+def register(user: dict):
+    fake_users.append(user)
+    return {"message": "registered"}
+
+@app.get("/history")
+def get_history(user=Depends(verify_token)):
+    return {"message": f"Hello {user['email']}"}

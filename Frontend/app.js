@@ -35,24 +35,32 @@ function goToDashboard() { closeSidebar(); showPage('dashboard-page'); }
 /* ═══════════════════════════
    AUTH — LOGIN
 ═══════════════════════════ */
-function doLogin() {
-  const email = document.getElementById('login-email').value.trim().toLowerCase();
-  const pass  = document.getElementById('login-pass').value.trim();
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-pass').value.trim();
 
-  let users = JSON.parse(localStorage.getItem("users")) || [];
+  try {
+    const res = await fetch("https://ai-based-health-risk-prediction.onrender.com/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password })
+    });
 
-  const user = users.find(u => u.email === email && u.password === pass);
-  console.log("Entered:", email, pass);
-  console.log("Stored users:", users);
+    const data = await res.json();
 
-  if (user) {
-    currentUser = user;
-    localStorage.setItem("currentUser", JSON.stringify(user));
-    applyUserToUI();
-    showPage('dashboard-page');
-    loadHistory();// 🔥 important
-  } else {
-    alert("Invalid email or password ❌");
+    if (data.access_token || data.token) {
+      localStorage.setItem("token", data.access_token || data.token);
+
+      applyUserToUI();
+      showPage('dashboard-page');
+      loadHistory(); // optional
+    } else {
+      alert("Login failed ❌");
+    }
+
+  } catch (err) {
+    console.error(err);
+    alert("Server error ❌");
   }
 }
 
@@ -107,14 +115,8 @@ function doRegister() {
    AUTH — LOGOUT
 ═══════════════════════════ */
 function logout() {
+  localStorage.removeItem("token");
   currentUser = null;
-
-  localStorage.removeItem("currentUser");
-  
-  document.getElementById('login-email').value = "";
-  document.getElementById('login-pass').value = "";
-
-
   showPage('login-page');
 }
 
@@ -300,12 +302,16 @@ async function predictRisk() {
   // API call
   let result;
 console.log("Sending data:", data);
-try {
+  try {
+      const token = localStorage.getItem("token");
   const response = await fetch("https://ai-based-health-risk-prediction.onrender.com/predict", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  });
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer " + token
+  },
+  body: JSON.stringify(data)
+ });
 
   if (!response.ok) {
     throw new Error("API failed");
@@ -362,7 +368,7 @@ try {
 
   let users = JSON.parse(localStorage.getItem("users")) || [];
 
-  // 🔍 find user
+  // find user
   const userIndex = users.findIndex(u => u.email === email);
 
   if (userIndex === -1) {
@@ -370,7 +376,7 @@ try {
     return;
   }
 
-  // ✅ update password
+  // update password
   users[userIndex].password = newPass;
 
   localStorage.setItem("users", JSON.stringify(users));
@@ -463,7 +469,13 @@ function riskClass(pct) {
 ═══════════════════════════ */
 async function loadHistory() {
   try {
-    const res = await fetch("https://ai-based-health-risk-prediction.onrender.com/history")
+    const token = localStorage.getItem("token");
+
+    const res = await fetch("https://ai-based-health-risk-prediction.onrender.com/history", {
+  headers: {
+    "Authorization": "Bearer " + token
+  }
+});
     const data = await res.json();
     window.historyData = data;
     console.log("History:", data);
