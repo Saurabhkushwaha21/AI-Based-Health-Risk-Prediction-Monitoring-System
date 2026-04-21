@@ -1,5 +1,4 @@
 'use strict';
-const BASE_URL = "https://your-backend-url.onrender.com";
 function initApp() {
   console.log("App loaded ✅");
 }
@@ -278,11 +277,11 @@ async function predictRisk() {
   }
 };
 
-  // API call//https://127.0.1:8001/predict
+  // API call
   let result;
 console.log("Sending data:", data);
 try {
-  const response = await fetch("BASE_URL/predict", {
+  const response = await fetch("http://127.0.0.1:8001/predict", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data)
@@ -444,7 +443,7 @@ function riskClass(pct) {
 ═══════════════════════════ */
 async function loadHistory() {
   try {
-    const res = await fetch("BASE_URL/history")
+    const res = await fetch("http://127.0.0.1:8001/history")
     const data = await res.json();
     window.historyData = data;
     console.log("History:", data);
@@ -495,7 +494,7 @@ function viewHistory(id) {
 }
 /*delete history*/
 async function deleteHistory(id) {
-  await fetch(`BASE_URL/${id}`, {
+  await fetch(`http://127.0.0.1:8001/delete/${id}`, {
     method: "DELETE"
   });
 

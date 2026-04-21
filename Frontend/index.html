@@ -503,7 +503,6 @@
         <p class="welcome">My Profile</p>
         <p class="section-sub">Your account details</p>
         <div class="profile-card">
-          <div class="profile-avatar" id="prof-avatar">JD</div>
           <div class="profile-info">
             <div class="pi-row"><span class="pi-lbl">Full Name</span><span class="pi-val" id="prof-name">—</span></div>
             <div class="pi-row"><span class="pi-lbl">Email</span><span class="pi-val" id="prof-email">—</span></div>
@@ -522,21 +521,76 @@
 
 <!-- FORGOT PASSWORD PAGE -->
 <div id="forgot-page" class="page">
-  <div class="form-card">
-    <h2>Forgot Password</h2>
+  <div class="form-card" style="
+      max-width: 400px;
+      margin: auto;
+      padding: 25px;
+      border-radius: 12px;
+      background: #ffffff;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      text-align: center;
+      font-family: Arial, sans-serif;
+  ">
+    
+    <h2 style="margin-bottom: 20px; color: #333;">Forgot Password</h2>
 
-    <input type="email" id="fp-email" placeholder="Enter your email" /><br>
-    <input type="password" id="fp-newpass" placeholder="New password" /><br>
-    <input type="password" id="fp-confirmpass" placeholder="Confirm password" /><br>
+    <input type="email" id="fp-email" placeholder="Enter your email"
+      style="
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 12px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        outline: none;
+    "/>
 
-    <button onclick="resetPassword()">Reset Password</button><br>
+    <input type="password" id="fp-newpass" placeholder="New password"
+      style="
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 12px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        outline: none;
+    "/>
 
-    <p onclick="goToLogin()" style="cursor:pointer;">
-    Back to Login
-</p>
+    <input type="password" id="fp-confirmpass" placeholder="Confirm password"
+      style="
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        outline: none;
+    "/>
+
+    <button onclick="resetPassword()"
+      style="
+        width: 100%;
+        padding: 10px;
+        background: #0c3a5e;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+    ">
+      Reset Password
+    </button>
+
+    <p onclick="goToLogin()"
+      style="
+        cursor: pointer;
+        color: black;
+        margin-top: 15px;
+        font-size: 14px;
+        text-decoration: underline;
+    ">
+      Back to Login
+    </p>
+
   </div>
 </div>
-
 <!-- ═══════════════════════════
      RESULTS PAGE
 ═══════════════════════════ -->
