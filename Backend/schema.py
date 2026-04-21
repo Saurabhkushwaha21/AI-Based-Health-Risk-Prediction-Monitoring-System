@@ -6,10 +6,10 @@ class HeartFeatures(BaseModel):
     sex: str
     chest_pain_type: str
     resting_blood_pressure: float
-    cholestoral: float   # ✅ FIXED
+    cholestoral: float   
     fasting_blood_sugar: str
     rest_ecg: str
-    Max_heart_rate: float   # ✅ FIXED
+    Max_heart_rate: float   
     exercise_induced_angina: str
     oldpeak: float
     slope: str
