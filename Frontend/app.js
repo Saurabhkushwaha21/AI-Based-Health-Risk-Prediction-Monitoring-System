@@ -1,17 +1,15 @@
 'use strict';
-const BASE_URL = "https://ai-based-health-risk-prediction.onrender.com";
-
 function initApp() {
   console.log("App loaded ✅");
 
-  const user = JSON.parse(localStorage.getItem("user"));
+  const savedUser = JSON.parse(localStorage.getItem("currentUser"));
 
-  if (user) {
-    currentUser = user;
+  if (savedUser) {
+    currentUser = savedUser;
     applyUserToUI();
-    showPage("dashboard-page");
+    showPage('dashboard-page');
   } else {
-    showPage("login-page");
+    showPage('login-page');
   }
 }
 
@@ -39,25 +37,82 @@ function goToDashboard() { closeSidebar(); showPage('dashboard-page'); }
    AUTH — LOGIN
 ═══════════════════════════ */
 function doLogin() {
-  const email = document.getElementById("login-email").value;
-  const pass = document.getElementById("login-pass").value;
+  const email = document.getElementById('login-email').value.trim().toLowerCase();
+  const pass  = document.getElementById('login-pass').value.trim();
+
+  let users = JSON.parse(localStorage.getItem("users")) || [];
+
+  const user = users.find(u => u.email === email && u.password === pass);
+  console.log("Entered:", email, pass);
+  console.log("Stored users:", users);
+
+  if (user) {
+    currentUser = user;
+    localStorage.setItem("currentUser", JSON.stringify(user));
+    applyUserToUI();
+    showPage('dashboard-page');
+    loadHistory();
+  } else {
+    alert("Invalid email or password ❌");
+  }
+}
+
+/* ═══════════════════════════
+   AUTH — REGISTER
+═══════════════════════════ */
+function doRegister() {
+  const email = document.getElementById('reg-email').value.trim().toLowerCase();
+  const pass = document.getElementById('reg-pass').value.trim();
+  const fname = document.getElementById('reg-fname').value;
+  const lname = document.getElementById('reg-lname').value;
+  const phone = document.getElementById('reg-phone').value;
+  const gender = document.getElementById('reg-gender').value;
+  const dob = document.getElementById('reg-dob').value;
+  const blood = document.getElementById('reg-blood').value;
+
 
   if (!email || !pass) {
     alert("Fill all fields");
     return;
   }
 
- localStorage.setItem("user", JSON.stringify({ email }));
-  showPage("dashboard-page");
+  let users = JSON.parse(localStorage.getItem("users")) || [];
+
+  const exists = users.find(u => u.email === email);
+  if (exists) {
+    alert("User already exists ❌");
+    return;
+  }
+
+  /*check password match */
+
+  const cpass = document.getElementById('reg-cpass').value;
+
+  if (pass !== cpass) {
+  alert("Passwords do not match ❌");
+  return;
+  }
+
+  // save clean data
+  users.push({ email, password: pass ,fname, lname,phone,
+  gender,
+  dob,
+  blood});
+
+  localStorage.setItem("users", JSON.stringify(users));
+
+  alert("Registered successfully ✅");
+
+  showPage('login-page');
 }
+
 /* ═══════════════════════════
    AUTH — LOGOUT
 ═══════════════════════════ */
 function logout() {
   currentUser = null;
 
-  localStorage.removeItem("user");
-  
+  localStorage.removeItem("currentUser");
   document.getElementById('login-email').value = "";
   document.getElementById('login-pass').value = "";
 
@@ -70,17 +125,28 @@ function logout() {
 ═══════════════════════════ */
 function applyUserToUI() {
   if (!currentUser) return;
+  const fullName = `${currentUser.fname} ${currentUser.lname}`;
+  const initials = `${currentUser.fname[0]}${currentUser.lname[0]}`.toUpperCase();
 
-  const email = currentUser.email || "User";
-  const initials = email[0].toUpperCase();
+  setText('welcome-name',    currentUser.fname);
+  setText('topbar-username', fullName);
+  setText('sb-username',     fullName);
+  setText('sb-avatar',       initials);
 
-  setText('welcome-name', email);
-  setText('topbar-username', email);
-  setText('sb-username', email);
-  setText('sb-avatar', initials);
+  // Profile section
+  setText('prof-name',    fullName);
+  setText('prof-email',   currentUser.email);
+  setText('prof-phone',   currentUser.phone   || '—');
+  setText('prof-gender',  currentUser.gender  || '—');
+  setText('prof-blood',   currentUser.blood   || '—');
+  setText('prof-dob',     currentUser.dob     || '—');
+  setText('prof-avatar',  initials);
+  setText('prof-tests',   testCount);
+}
 
-  setText('prof-email', email);
-  setText('prof-tests', testCount);
+function setText(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
 }
 
 /* ═══════════════════════════
@@ -200,8 +266,6 @@ async function predictRisk() {
       cp == 2 ? "Non-anginal Pain" : "Asymptomatic",
 
     resting_blood_pressure: rbp,
-
-    // 🔥 FIX 1 (spelling change)
     cholestoral: chol,
     fasting_blood_sugar:
       fbs == 1 ? "Greater than 120 mg/ml" : "Lower than 120 mg/ml",
@@ -210,8 +274,6 @@ async function predictRisk() {
       ecg == 0 ? "Normal" :
       ecg == 1 ? "ST-T wave abnormality" :
       "Left ventricular hypertrophy",
-
-    // 🔥 FIX 2 (capital M)
     Max_heart_rate: maxHr,
 
     exercise_induced_angina: angina == 1 ? "Yes" : "No",
@@ -237,24 +299,18 @@ async function predictRisk() {
   let result;
 console.log("Sending data:", data);
 try {
- const response = await fetch(`${BASE_URL}/predict`, {
+  const response = await fetch("https://ai-based-health-risk-prediction.onrender.com/predict", {
     method: "POST",
-    headers: {
-    "Content-Type": "application/json"
-   },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data)
-   });
-  
+  });
+
   if (!response.ok) {
     throw new Error("API failed");
   }
 
   result = await response.json(); 
 
-  if (!token) {
-  alert("Login required ❌");
-  return;
-}
   console.log("API result:", result);
 
 } catch (err) {
@@ -303,8 +359,6 @@ try {
   }
 
   let users = JSON.parse(localStorage.getItem("users")) || [];
-
-  // find user
   const userIndex = users.findIndex(u => u.email === email);
 
   if (userIndex === -1) {
@@ -396,7 +450,7 @@ function setClass(id, cls) {
 function riskClass(pct) {
   if (pct >= 70) return { color:'c-danger',  bg:'bg-danger',  tag:'tag-danger',  label:'High'   };
   if (pct >= 40) return { color:'c-warning', bg:'bg-warning', tag:'tag-warning', label:'Medium' };
-  return { color:'c-success', bg:'bg-success', tag:'tag-success', label:'Low'    };
+  return             { color:'c-success', bg:'bg-success', tag:'tag-success', label:'Low'    };
 }
 
 
@@ -405,7 +459,7 @@ function riskClass(pct) {
 ═══════════════════════════ */
 async function loadHistory() {
   try {
-    const res = await fetch(`${BASE_URL}/history`);
+    const res = await fetch("https://ai-based-health-risk-prediction.onrender.com/history")
     const data = await res.json();
     window.historyData = data;
     console.log("History:", data);
@@ -450,13 +504,13 @@ function viewHistory(id) {
     item.overall_risk,
     item.heart_risk,
     item.diabetes_risk,
-    item.input_data?.features || []   // future use
+    item.input_data?.features || [] 
   );
   showPage('results-page');
 }
 /*delete history*/
 async function deleteHistory(id) {
-  await fetch(`${BASE_URL}/delete/${id}`, {
+  await fetch(`https://ai-based-health-risk-prediction.onrender.com/delete/${id}`, {
     method: "DELETE"
   });
 
