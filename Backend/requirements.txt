@@ -5,3 +5,5 @@ pydantic
 numpy
 pandas
 scikit-learn
+python-jose
+passlib[bcrypt]
