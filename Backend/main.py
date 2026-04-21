@@ -42,7 +42,7 @@ def predict(data: HealthInput, db: Session = Depends(get_db)):
 
         result = final_health_prediction(input_data)
 
-        # ✅ SAVE TO DB
+        # SAVE TO DB
         new_entry = Prediction(
             diabetes_risk=result.get("Diabetes_Risk (%)", 0),
             heart_risk=result.get("Heart_Risk (%)", 0),
@@ -90,7 +90,6 @@ def delete_prediction(id: int, db: Session = Depends(get_db)):
 
 #authentication end point
 fake_users = []
-
 @app.post("/login")
 def login(data: dict):
     for u in fake_users:
@@ -105,6 +104,7 @@ def register(user: dict):
     fake_users.append(user)
     return {"message": "registered"}
 
-@app.get("/history")
+
+@app.get("/history-secure")
 def get_history(user=Depends(verify_token)):
     return {"message": f"Hello {user['email']}"}

@@ -313,9 +313,8 @@ console.log("Sending data:", data);
   body: JSON.stringify(data)
  });
 
-  if (!response.ok) {
-    throw new Error("API failed");
-  }
+  const text = await response.text();
+  console.log(text);
 
   result = await response.json(); 
 
