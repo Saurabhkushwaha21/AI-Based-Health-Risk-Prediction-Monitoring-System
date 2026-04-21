@@ -50,7 +50,7 @@ async function doLogin() {
 
     if (data.access_token || data.token) {
       localStorage.setItem("token", data.access_token || data.token);
-
+      currentUser = { email };
       applyUserToUI();
       showPage('dashboard-page');
       loadHistory(); // optional
