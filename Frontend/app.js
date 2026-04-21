@@ -1,6 +1,15 @@
 'use strict';
 function initApp() {
   console.log("App loaded ✅");
+   const savedUser = JSON.parse(localStorage.getItem("currentUser"));
+
+  if (savedUser) {
+    currentUser = savedUser;
+    applyUserToUI();
+    showPage('dashboard-page');
+  } else {
+    showPage('login-page');
+  }
 }
 
 /* ════════════════════════════════════════════════
@@ -38,6 +47,7 @@ function doLogin() {
 
   if (user) {
     currentUser = user;
+    localStorage.setItem("currentUser", JSON.stringify(user));
     applyUserToUI();
     showPage('dashboard-page');
     loadHistory();// 🔥 important
@@ -82,8 +92,6 @@ function doRegister() {
   alert("Passwords do not match ❌");
   return;
   }
-
-  // ✅ save clean data
   users.push({ email, password: pass ,fname, lname,phone,
   gender,
   dob,
@@ -93,10 +101,22 @@ function doRegister() {
 
   alert("Registered successfully ✅");
 
-  // 👉 optional: login page pe le jao
   showPage('login-page');
 }
+/* ═══════════════════════════
+   AUTH — LOGOUT
+═══════════════════════════ */
+function logout() {
+  currentUser = null;
 
+  localStorage.removeItem("currentUser");
+  
+  document.getElementById('login-email').value = "";
+  document.getElementById('login-pass').value = "";
+
+
+  showPage('login-page');
+}
 
 /* ═══════════════════════════
    APPLY USER TO UI
@@ -291,20 +311,20 @@ try {
     throw new Error("API failed");
   }
 
-  result = await response.json(); // ✅ only once
+  result = await response.json(); 
 
   console.log("API result:", result);
 
 } catch (err) {
   console.error("Error:", err);
   alert("Backend not working ❌");
-  return; // ✅ IMPORTANT (stop further execution)
+  return; 
 }
 
     const diabetesRisk = result["Diabetes_Risk (%)"] || 0;
     const heartRisk = result["Heart_Risk (%)"] || 0;
     const overall = result["Overall_Risk (%)"] || 0;
-    // ✅ features calculation (YAHI shift karo)
+    
     const features = [
       { name: 'Glucose', val: clamp(Math.round((glucose - 70) * 0.3), 0, 100) },
       { name: 'Age', val: clamp(Math.round((Math.max(dAge, hAge) - 20) * 1.1), 0, 100) },
@@ -357,7 +377,7 @@ try {
 
   alert("Password reset successful ✅");
 
-  goToLogin(); // login page pe redirect
+  goToLogin(); 
   }
 
 /* ═══════════════════════════
