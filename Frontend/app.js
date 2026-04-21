@@ -45,15 +45,18 @@ function doLogin() {
   console.log("Entered:", email, pass);
   console.log("Stored users:", users);
 
-  if (user) {
-    currentUser = user;
-    localStorage.setItem("currentUser", JSON.stringify(user));
-    applyUserToUI();
-    showPage('dashboard-page');
-    loadHistory();
-  } else {
-    alert("Invalid email or password ❌");
-  }
+  if (data.access_token) {
+  localStorage.setItem("token", data.access_token);
+
+  const payload = JSON.parse(atob(data.access_token.split(".")[1]));
+
+  currentUser = { email: payload.email };
+
+  localStorage.setItem("currentUser", JSON.stringify(currentUser));
+
+  applyUserToUI();
+  showPage("dashboard-page");
+}
 }
 
 /* ═══════════════════════════
@@ -77,7 +80,6 @@ function doRegister() {
 
   let users = JSON.parse(localStorage.getItem("users")) || [];
 
-  // ✅ check duplicate email
   const exists = users.find(u => u.email === email);
   if (exists) {
     alert("User already exists ❌");
@@ -85,7 +87,6 @@ function doRegister() {
   }
 
   /*check password match */
-
   const cpass = document.getElementById('reg-cpass').value;
 
   if (pass !== cpass) {
@@ -301,10 +302,15 @@ async function predictRisk() {
   let result;
 console.log("Sending data:", data);
 try {
-  const response = await fetch("https://ai-based-health-risk-prediction.onrender.com/predict", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
+ const token = localStorage.getItem("token");
+
+const response = await fetch("https://ai-based-health-risk-prediction.onrender.com/predict", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer " + token
+  },
+  body: JSON.stringify(data)
   });
 
   if (!response.ok) {
@@ -312,7 +318,11 @@ try {
   }
 
   result = await response.json(); 
-
+  
+  if (result.access_token) {
+  localStorage.setItem("token", result.access_token);
+  showPage("dashboard-page");
+  }
   console.log("API result:", result);
 
 } catch (err) {
@@ -491,7 +501,7 @@ async function loadHistory() {
 
       <div class="hc-actions">
         <button onclick='viewHistory(${item.id})'>View</button>
-        <button onclick='deleteHistory("${item.id}")'>Delete</button>
+        <button onclick='deleteHistory(${item.id})'>Delete</button>
       </div>
     </div>
   `).join("");

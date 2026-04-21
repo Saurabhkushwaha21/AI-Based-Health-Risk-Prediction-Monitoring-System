@@ -5,9 +5,11 @@ from schema import HealthInput
 from database import get_db, Prediction
 from sqlalchemy.orm import Session
 import json
-from auth import SECRET_KEY, create_token
+from auth import SECRET_KEY, create_token, verify_password
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import jwt
+from database import get_db, User
+from auth import hash_password
 
 app = FastAPI()
 
@@ -22,10 +24,11 @@ app.add_middleware(
 
 security = HTTPBearer()
 
-def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
+def verify_token(credentials=Depends(security)):
     token = credentials.credentials
     payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
     return payload
+
 
 @app.get("/")
 def home():
@@ -89,22 +92,36 @@ def delete_prediction(id: int, db: Session = Depends(get_db)):
     return {"error": "Not found"}
 
 #authentication end point
-fake_users = []
-
 @app.post("/login")
-def login(data: dict):
-    for u in fake_users:
-        if u["email"] == data["email"] and u["password"] == data["password"]:
-            token = create_token({"email": u["email"]})
-            return {"access_token": token}
-    return {"error": "Invalid login"}
+def login(data: dict, db: Session = Depends(get_db)):
+
+    user = db.query(User).filter(User.email == data["email"]).first()
+
+    if not user:
+        return {"error": "User not found"}
+
+    if not verify_password(data["password"], user.password):
+        return {"error": "Wrong password"}
+
+    token = create_token({"email": user.email})
+
+    return {"access_token": token}
 
 #this is just a dummy register end point, in real application you should use proper database and hashing for passwords
 @app.post("/register")
-def register(user: dict):
-    fake_users.append(user)
-    return {"message": "registered"}
+def register(user: dict, db: Session = Depends(get_db)):
+    hashed_pw = hash_password(user["password"])
+
+    new_user = User(
+        email=user["email"],
+        password=hashed_pw
+    )
+
+    db.add(new_user)
+    db.commit()
+
+    return {"message": "User registered successfully"}
 
 @app.get("/history")
 def get_history(user=Depends(verify_token)):
-    return {"message": f"Hello {user['email']}"}
+    return {"message": f"Welcome {user['email']}"}

@@ -1,4 +1,4 @@
-﻿from sqlalchemy import create_engine, Column, Integer, Float, Text, DateTime
+﻿from sqlalchemy import String, create_engine, Column, Integer, Float, Text, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime, timezone
@@ -36,3 +36,10 @@ def get_db():
         yield db
     finally:
         db.close()
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, unique=True, index=True)
+    password = Column(String)
