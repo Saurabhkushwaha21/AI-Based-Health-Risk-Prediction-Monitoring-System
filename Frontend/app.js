@@ -1,4 +1,6 @@
 'use strict';
+const BASE_URL = "https://ai-based-health-risk-prediction.onrender.com";
+
 function initApp() {
   console.log("App loaded ✅");
    const savedUser = JSON.parse(localStorage.getItem("currentUser"));
@@ -35,17 +37,23 @@ function goToDashboard() { closeSidebar(); showPage('dashboard-page'); }
 /* ═══════════════════════════
    AUTH — LOGIN
 ═══════════════════════════ */
-function doLogin() {
+async function doLogin() {
   const email = document.getElementById('login-email').value.trim().toLowerCase();
-  const pass  = document.getElementById('login-pass').value.trim();
+  const password = document.getElementById('login-pass').value.trim();
 
-  let users = JSON.parse(localStorage.getItem("users")) || [];
+  const res = await fetch(`${BASE_URL}/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password })
+  });
 
-  const user = users.find(u => u.email === email && u.password === pass);
-  console.log("Entered:", email, pass);
-  console.log("Stored users:", users);
+  const data = await res.json();
 
-  if (data.access_token) {
+  if (!data.access_token) {
+    alert("Login failed ❌");
+    return;
+  }
+
   localStorage.setItem("token", data.access_token);
 
   const payload = JSON.parse(atob(data.access_token.split(".")[1]));
@@ -56,53 +64,6 @@ function doLogin() {
 
   applyUserToUI();
   showPage("dashboard-page");
-}
-}
-
-/* ═══════════════════════════
-   AUTH — REGISTER
-═══════════════════════════ */
-function doRegister() {
-  const email = document.getElementById('reg-email').value.trim().toLowerCase();
-  const pass = document.getElementById('reg-pass').value.trim();
-  const fname = document.getElementById('reg-fname').value;
-  const lname = document.getElementById('reg-lname').value;
-  const phone = document.getElementById('reg-phone').value;
-  const gender = document.getElementById('reg-gender').value;
-  const dob = document.getElementById('reg-dob').value;
-  const blood = document.getElementById('reg-blood').value;
-
-
-  if (!email || !pass) {
-    alert("Fill all fields");
-    return;
-  }
-
-  let users = JSON.parse(localStorage.getItem("users")) || [];
-
-  const exists = users.find(u => u.email === email);
-  if (exists) {
-    alert("User already exists ❌");
-    return;
-  }
-
-  /*check password match */
-  const cpass = document.getElementById('reg-cpass').value;
-
-  if (pass !== cpass) {
-  alert("Passwords do not match ❌");
-  return;
-  }
-  users.push({ email, password: pass ,fname, lname,phone,
-  gender,
-  dob,
-  blood});
-
-  localStorage.setItem("users", JSON.stringify(users));
-
-  alert("Registered successfully ✅");
-
-  showPage('login-page');
 }
 /* ═══════════════════════════
    AUTH — LOGOUT
@@ -304,7 +265,7 @@ console.log("Sending data:", data);
 try {
  const token = localStorage.getItem("token");
 
-const response = await fetch("https://ai-based-health-risk-prediction.onrender.com/predict", {
+const response = await fetch(`${BASE_URL}/predict`, {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
@@ -318,11 +279,12 @@ const response = await fetch("https://ai-based-health-risk-prediction.onrender.c
   }
 
   result = await response.json(); 
-  
-  if (result.access_token) {
-  localStorage.setItem("token", result.access_token);
-  showPage("dashboard-page");
-  }
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+  alert("Login required ❌");
+  return;
+}
   console.log("API result:", result);
 
 } catch (err) {
@@ -464,7 +426,7 @@ function setClass(id, cls) {
 function riskClass(pct) {
   if (pct >= 70) return { color:'c-danger',  bg:'bg-danger',  tag:'tag-danger',  label:'High'   };
   if (pct >= 40) return { color:'c-warning', bg:'bg-warning', tag:'tag-warning', label:'Medium' };
-  return             { color:'c-success', bg:'bg-success', tag:'tag-success', label:'Low'    };
+  return { color:'c-success', bg:'bg-success', tag:'tag-success', label:'Low'    };
 }
 
 
@@ -473,7 +435,12 @@ function riskClass(pct) {
 ═══════════════════════════ */
 async function loadHistory() {
   try {
-    const res = await fetch("https://ai-based-health-risk-prediction.onrender.com/history")
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${BASE_URL}/history`, {
+  headers: {
+    "Authorization": "Bearer " + token
+  }
+});
     const data = await res.json();
     window.historyData = data;
     console.log("History:", data);
@@ -501,7 +468,7 @@ async function loadHistory() {
 
       <div class="hc-actions">
         <button onclick='viewHistory(${item.id})'>View</button>
-        <button onclick='deleteHistory(${item.id})'>Delete</button>
+        <button onclick='deleteHistory("${item.id}")'>Delete</button>
       </div>
     </div>
   `).join("");
@@ -524,7 +491,7 @@ function viewHistory(id) {
 }
 /*delete history*/
 async function deleteHistory(id) {
-  await fetch(`https://ai-based-health-risk-prediction.onrender.com/delete/${id}`, {
+  await fetch(`${BASE_URL}/delete/${id}`, {
     method: "DELETE"
   });
 
