@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Health Risk Prediction System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="bg-mesh" aria-hidden="true"></div>
+<div class="bg-grid" aria-hidden="true"></div>
+
+<!-- ═══════════════════════════
+     LOGIN PAGE
+═══════════════════════════ -->
+<div id="login-page" class="page active">
+  <div class="auth-card">
+    <div class="brand">
+      <div class="brand-icon">💗</div>
+      <h1>Health Risk<br>Prediction System</h1>
+      <p>— Predict Your <span>Health Risk</span> —</p>
+    </div>
+    <p class="auth-title">User Login</p>
+    <div class="field">
+      <label for="login-email">Email / Username</label>
+      <div class="input-wrap">
+        <span class="icon">✉️</span>
+        <input type="email" id="login-email" placeholder="Enter your email/username" autocomplete="email">
+      </div>
+    </div>
+    <div class="field">
+      <label for="login-pass">Password</label>
+      <div class="input-wrap">
+        <span class="icon">🔒</span>
+        <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+      </div>
+    </div>
+    <div class="forgot">
+        <a href="#" onclick="showPage('forgot-page')">Forgot Password?</a>
+    </div>
+    <button type="button" class="btn-primary" onclick="doLogin()">Login</button>
+    <div id="login-error" class="auth-error" style="display:none"></div>
+    <div class="auth-footer">Don't have an account? <a href="#" onclick="showPage('register-page')">Register</a></div>
+    <div class="secure-badge">🔒 Secure &amp; Protected</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════
+     REGISTER PAGE
+═══════════════════════════ -->
+<div id="register-page" class="page">
+  <div class="auth-card wide-card">
+    <div class="brand">
+      <div class="brand-icon">💗</div>
+      <h1>Create Account</h1>
+      <p>— Join the Health Prediction Platform —</p>
+    </div>
+    <p class="auth-title">New Registration</p>
+
+    <div class="reg-grid">
+      <div class="field">
+        <label for="reg-fname">First Name</label>
+        <div class="input-wrap"><span class="icon">👤</span>
+          <input type="text" id="reg-fname" placeholder="Enter your first name" autocomplete="given-name">
+        </div>
+      </div>
+      <div class="field">
+        <label for="reg-lname">Last Name</label>
+        <div class="input-wrap"><span class="icon">👤</span>
+          <input type="text" id="reg-lname" placeholder="Enter your last name" autocomplete="family-name">
+        </div>
+      </div>
+      <div class="field span2">
+        <label for="reg-email">Email Address</label>
+        <div class="input-wrap"><span class="icon">✉️</span>
+          <input type="email" id="reg-email" placeholder="Example123@gmail.com" autocomplete="email">
+        </div>
+      </div>
+      <div class="field">
+        <label for="reg-phone">Phone Number</label>
+        <div class="input-wrap"><span class="icon">📱</span>
+          <input type="tel" id="reg-phone" placeholder="+91 9876543210" autocomplete="tel">
+        </div>
+      </div>
+      <div class="field">
+        <label for="reg-dob">Date of Birth</label>
+        <div class="input-wrap"><span class="icon">📅</span>
+          <input type="date" id="reg-dob" autocomplete="bday">
+        </div>
+      </div>
+      <div class="field">
+        <label for="reg-gender">Gender</label>
+        <div class="input-wrap"><span class="icon">⚧</span>
+          <select id="reg-gender">
+            <option value="">Select Gender</option>
+            <option>Male</option><option>Female</option>
+            <option>Other</option><option>Prefer not to say</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="reg-blood">Blood Group</label>
+        <div class="input-wrap"><span class="icon">🩸</span>
+          <select id="reg-blood">
+            <option value="">Select</option>
+            <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+            <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
+          </select>
+        </div>
+      </div>
+      <div class="field span2">
+        <label for="reg-pass">Password</label>
+        <div class="input-wrap"><span class="icon">🔒</span>
+          <input type="password" id="reg-pass" placeholder="Min. 8 characters" autocomplete="new-password">
+        </div>
+      </div>
+      <div class="field span2">
+        <label for="reg-cpass">Confirm Password</label>
+        <div class="input-wrap"><span class="icon">🔒</span>
+          <input type="password" id="reg-cpass" placeholder="Re-enter password" autocomplete="new-password">
+        </div>
+      </div>
+    </div>
+
+    <label class="checkbox-row">
+      <input type="checkbox" id="reg-terms">
+      <span>I agree to the <a href="#">Terms &amp; Conditions</a> and <a href="#">Privacy Policy</a></span>
+    </label>
+
+    <button class="btn-primary" onclick="doRegister()" style="margin-top:1.2rem">Create Account</button>
+    <div id="reg-error" class="auth-error" style="display:none"></div>
+    <div class="auth-footer">Already have an account? <a href="#" onclick="showPage('login-page')">Login</a></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════
+     DASHBOARD PAGE
+═══════════════════════════ -->
+<div id="dashboard-page" class="page">
+
+  <!-- Mobile topbar -->
+  <div class="mobile-topbar">
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu" onclick="toggleSidebar()">
+      <span></span><span></span><span></span>
+    </button>
+    <span class="mobile-brand">💗 Health Dashboard</span>
+    <button class="btn-icon" onclick="logout()">⏻</button>
+  </div>
+
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-logo">💗</div>
+    <div class="nav-item active" onclick="switchSection('section-home',this)" tabindex="0">
+      <span class="nav-icon">🏠</span><span class="nav-label">Dashboard</span>
+    </div>
+    <div class="nav-item" onclick="switchSection('section-input',this)" tabindex="0">
+      <span class="nav-icon">📋</span><span class="nav-label">Input Data</span>
+    </div>
+    <div class="nav-item" onclick="switchSection('section-history',this)" tabindex="0">
+      <span class="nav-icon">🕓</span><span class="nav-label">History</span>
+    </div>
+    <div class="nav-item" onclick="switchSection('section-reports',this)" tabindex="0">
+      <span class="nav-icon">📊</span><span class="nav-label">Reports</span>
+    </div>
+    <div class="nav-item" onclick="switchSection('section-profile',this)" tabindex="0">
+      <span class="nav-icon">👤</span><span class="nav-label">Profile</span>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="sidebar-user">
+        <div class="su-avatar" id="sb-avatar">US</div>
+        <div class="su-info">
+          <span class="su-name" id="sb-username">User Name</span>
+          <span class="su-role">Patient</span>
+        </div>
+      </div>
+      <button class="btn-logout-sidebar" onclick="logout()">⏻ Logout</button>
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <h2 id="topbar-title">Health Dashboard</h2>
+      <div class="topbar-right">
+        <span class="user-pill">👤 <span id="topbar-username"></span></span>
+        <button class="btn-logout" onclick="logout()">Logout</button>
+      </div>
+    </div>
+
+    <!-- HOME -->
+    <div id="section-home" class="section active">
+      <div class="section-body">
+        <p class="welcome">Welcome, <span id="welcome-name">Patient</span> 👋</p>
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-icon">🫀</div>
+            <div class="stat-info"><span class="stat-val" id="stat-heart">--</span><span class="stat-lbl">Last Heart Risk</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🩸</div>
+            <div class="stat-info"><span class="stat-val" id="stat-diab">--</span><span class="stat-lbl">Last Diabetes Risk</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📋</div>
+            <div class="stat-info"><span class="stat-val" id="stat-tests">0</span><span class="stat-lbl">Tests Completed</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📅</div>
+            <div class="stat-info"><span class="stat-val" id="stat-date">—</span><span class="stat-lbl">Last Assessment</span></div>
+          </div>
+        </div>
+        <h3 class="section-heading">Quick Actions</h3>
+        <div class="qa-grid">
+          <button class="qa-btn" onclick="switchSection('section-input',document.querySelectorAll('.nav-item')[1])">⚡ New Prediction</button>
+          <button class="qa-btn secondary" onclick="switchSection('section-history',document.querySelectorAll('.nav-item')[2])">🕓 View History</button>
+          <button class="qa-btn secondary" onclick="switchSection('section-reports',document.querySelectorAll('.nav-item')[3])">📊 Reports</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- INPUT DATA -->
+    <div id="section-input" class="section">
+      <div class="section-body">
+        <p class="welcome">Enter Health Details</p>
+        <p class="section-sub">Fill both tabs for a complete risk prediction</p>
+
+        <div class="tab-bar">
+          <button class="tab-btn active" id="tabBtn-diabetes" onclick="switchTab('tab-diabetes',this)">🩸 Diabetes</button>
+          <button class="tab-btn" id="tabBtn-heart" onclick="switchTab('tab-heart',this)">🫀 Heart Disease</button>
+        </div>
+
+        <!-- Diabetes Tab -->
+        <div id="tab-diabetes" class="tab-pane active">
+          <div class="form-card animate-in">
+            <h3>🩸 Diabetes Risk Features</h3>
+            <div class="hf-grid">
+
+              <div class="hf-row">
+                <span class="hf-icon">🤰</span>
+                <label class="hf-label" for="pregnancies">Pregnancies</label>
+                <div class="hf-ctrl">
+                  <input type="number" id="pregnancies" value="1" min="0" max="20" placeholder="0">
+                  <span class="hf-unit">times</span>
+                </div>
+              </div>
+
+              <div class="hf-row">
+                <span class="hf-icon">🩸</span>
+                <label class="hf-label" for="glucose">Plasma Glucose</label>
+                <div class="hf-ctrl">
+                  <input type="number" id="glucose" value="120" min="0" max="300" placeholder="120">
+                  <span class="hf-unit">mg/dL</span>
+                </div>
+              </div>
+
+              <div class="hf-row">
+                <span class="hf-icon">🩺</span>
+                <label class="hf-label" for="bp">Blood Pressure</label>
+                <div class="hf-ctrl">
+                  <input type="number" id="bp" value="70" min="0" max="200" placeholder="70">
+                  <span class="hf-unit">mmHg</span>
+                </div>
+              </div>
+
+              <div class="hf-row">
+                <span class="hf-icon">📏</span>
+                <label class="hf-label" for="skin">Skin Thickness</label>
+                <div class="hf-ctrl">
+                  <input type="number" id="skin" value="20" min="0" max="100" placeholder="20">
+                  <span class="hf-unit">mm</span>
+                </div>
+              </div>
+
+              <div class="hf-row">
+                <span class="hf-icon">💉</span>
+                <label class="hf-label" for="insulin">2-Hour Insulin</label>
+                <div class="hf-ctrl">
+                  <input type="number" id="insulin" value="80" min="0" max="900" placeholder="80">
+                  <span class="hf-unit">µU/mL</span>
+                </div>
+              </div>
+
+              <div class="hf-row">
+                <span class="hf-icon">⚖️</span>
+                <label class="hf-label" for="d-bmi">BMI</label>
+                <div class="hf-ctrl">
+                  <input type="number" id="d-bmi" value="28.4" step="0.1" min="0" max="70" placeholder="28.4">
+                  <span class="hf-unit">kg/m²</span>
+                </div>
+              </div>
+
+              <div class="hf-row">
+                <span class="hf-icon">🧬</span>
+                <label class="hf-label" for="dpf">Diabetes Pedigree Function</label>
+                <div class="hf-ctrl">
+                  <input type="number" id="dpf" value="0.47" step="0.01" min="0" max="3" placeholder="0.47">
+                </div>
+              </div>
+
+              <div class="hf-row">
+                <span class="hf-icon">🧑</span>
+                <label class="hf-label" for="d-age">Age</label>
+                <div class="hf-ctrl">
+                  <input type="number" id="d-age" value="33" min="1" max="120" placeholder="33">
+                  <span class="hf-unit">yrs</span>
+                </div>
+              </div>
+
+            </div>
+            <button class="btn-tab-next" onclick="switchTab('tab-heart', document.getElementById('tabBtn-heart'))">
+              Next: Heart Features →
+            </button>
+          </div>
+        </div>
+
+        <!-- Heart Tab -->
+        <div id="tab-heart" class="tab-pane">
+          <div class="form-card animate-in">
+            <h3>🫀 Heart Disease Risk Features</h3>
+            <div class="hf-grid">
+
+              <div class="hf-row">
+                <span class="hf-icon">🧑</span>
+                <label class="hf-label" for="h-age">Age</label>
+                <div class="hf-ctrl">
+                  <input type="number" id="h-age" value="54" min="1" max="120" placeholder="54">
+                  <span class="hf-unit">yrs</span>
+                </div>
+              </div>
+
+              <div class="hf-row">
+                <span class="hf-icon">⚧</span>
+                <label class="hf-label" for="sex">Sex</label>
+                <div class="hf-ctrl">
+                  <select id="sex">
+                    <option value="1">Male</option>
+                    <option value="0">Female</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="hf-row">
+                <span class="hf-icon">💔</span>
+                <label class="hf-label" for="cp">Chest Pain Type</label>
+                <div class="hf-ctrl">
+                  <select id="cp">
+                    <option value="0">Typical Angina</option>
+                    <option value="1">Atypical Angina</option>
+                    <option value="2">Non-Anginal Pain</option>
+                    <option value="3" selected>Asymptomatic</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="hf-row">
+                <span class="hf-icon">🩺</span>
+                <label class="hf-label" for="rbp">Resting Blood Pressure</label>
+                <div class="hf-ctrl">
+                  <input type="number" id="rbp" value="130" min="60" max="250" placeholder="130">
+                  <span class="hf-unit">mmHg</span>
+                </div>
+              </div>
+
+              <div class="hf-row">
+                <span class="hf-icon">🫀</span>
+                <label class="hf-label" for="chol">Serum Cholesterol</label>
+                <div class="hf-ctrl">
+                  <input type="number" id="chol" value="250" min="100" max="600" placeholder="250">
+                  <span class="hf-unit">mg/dL</span>
+                </div>
+              </div>
+
+              <div class="hf-row">
+                <span class="hf-icon">🍬</span>
+                <label class="hf-label" for="fbs">Fasting Blood Sugar &gt;120 mg/dL</label>
+                <div class="hf-ctrl">
+                  <select id="fbs">
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="hf-row">
+                <span class="hf-icon">📈</span>
+                <label class="hf-label" for="ecg">Resting ECG Results</label>
+                <div class="hf-ctrl">
+                  <select id="ecg">
+                    <option value="0">Normal</option>
+                    <option value="1">ST-T Wave Abnormality</option>
+                    <option value="2">LV Hypertrophy</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="hf-row">
+                <span class="hf-icon">💓</span>
+                <label class="hf-label" for="max-hr">Max Heart Rate Achieved</label>
+                <div class="hf-ctrl">
+                  <input type="number" id="max-hr" value="150" min="60" max="250" placeholder="150">
+                  <span class="hf-unit">bpm</span>
+                </div>
+              </div>
+
+              <div class="hf-row">
+                <span class="hf-icon">🏃</span>
+                <label class="hf-label" for="angina">Exercise-Induced Angina</label>
+                <div class="hf-ctrl">
+                  <select id="angina">
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="hf-row">
+                <span class="hf-icon">📉</span>
+                <label class="hf-label" for="oldpeak">ST Depression (Oldpeak)</label>
+                <div class="hf-ctrl">
+                  <input type="number" id="oldpeak" value="1.0" step="0.1" min="0" max="10" placeholder="1.0">
+                </div>
+              </div>
+
+              <div class="hf-row">
+                <span class="hf-icon">📊</span>
+                <label class="hf-label" for="slope">Slope of Peak ST Segment</label>
+                <div class="hf-ctrl">
+                  <select id="slope">
+                    <option value="0">Upsloping</option>
+                    <option value="1">Flat</option>
+                    <option value="2">Downsloping</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="hf-row">
+                <span class="hf-icon">🩻</span>
+                <label class="hf-label" for="vessels">Major Vessels (Fluoroscopy)</label>
+                <div class="hf-ctrl">
+                  <select id="vessels">
+                    <option value="0">Zero</option>
+                    <option value="1">One</option>
+                    <option value="2">Two</option>
+                    <option value="3">Three</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="hf-row">
+                <span class="hf-icon">🧪</span>
+                <label class="hf-label" for="thal">Thalassemia</label>
+                <div class="hf-ctrl">
+                  <select id="thal">
+                    <option value="1">Normal</option>
+                    <option value="2">Fixed Defect</option>
+                    <option value="3" selected>Reversible Defect</option>
+                  </select>
+                </div>
+              </div>
+
+            </div>
+            <button class="btn-predict" onclick="predictRisk()">
+              <span>⚡</span> Predict Risk <span>→</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- HISTORY -->
+    <div id="section-history" class="section">
+      <div class="section-body">
+        <p class="welcome">Prediction History</p>
+        <p class="section-sub">Your past assessments</p>
+        <div class="empty-state" id="history-empty">
+          <span class="empty-icon">🕓</span>
+          <p>No predictions yet.<br>Complete your first assessment!</p>
+          <button class="btn-primary sm" style="margin-top:1rem" onclick="switchSection('section-input',document.querySelectorAll('.nav-item')[1])">Start Now →</button>
+        </div>
+        <div id="history-list" class="history-list"></div>
+      </div>
+    </div>
+
+    <!-- REPORTS -->
+    <div id="section-reports" class="section">
+      <div class="section-body">
+        <p class="welcome">Reports</p>
+        <p class="section-sub">Summary charts and trends</p>
+        <div class="empty-state">
+          <span class="empty-icon">📊</span>
+          <div id="report-data"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROFILE -->
+    <div id="section-profile" class="section">
+      <div class="section-body">
+        <p class="welcome">My Profile</p>
+        <p class="section-sub">Your account details</p>
+        <div class="profile-card">
+          <div class="profile-info">
+            <div class="pi-row"><span class="pi-lbl">Full Name</span><span class="pi-val" id="prof-name">—</span></div>
+            <div class="pi-row"><span class="pi-lbl">Email</span><span class="pi-val" id="prof-email">—</span></div>
+            <div class="pi-row"><span class="pi-lbl">Phone</span><span class="pi-val" id="prof-phone">—</span></div>
+            <div class="pi-row"><span class="pi-lbl">Gender</span><span class="pi-val" id="prof-gender">—</span></div>
+            <div class="pi-row"><span class="pi-lbl">Date of Birth</span><span class="pi-val" id="prof-dob">—</span></div>
+            <div class="pi-row"><span class="pi-lbl">Blood Group</span><span class="pi-val" id="prof-blood">—</span></div>
+            <div class="pi-row"><span class="pi-lbl">Total Tests</span><span class="pi-val" id="prof-tests">0</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FORGOT PASSWORD PAGE -->
+<div id="forgot-page" class="page">
+  <div class="form-card" style="
+      max-width: 400px;
+      margin: auto;
+      padding: 25px;
+      border-radius: 12px;
+      background: #ffffff;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      text-align: center;
+      font-family: Arial, sans-serif;
+  ">
+    
+    <h2 style="margin-bottom: 20px; color: #333;">Forgot Password</h2>
+
+    <input type="email" id="fp-email" placeholder="Enter your email"
+      style="
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 12px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        outline: none;
+    "/>
+
+    <input type="password" id="fp-newpass" placeholder="New password"
+      style="
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 12px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        outline: none;
+    "/>
+
+    <input type="password" id="fp-confirmpass" placeholder="Confirm password"
+      style="
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        outline: none;
+    "/>
+
+    <button onclick="resetPassword()"
+      style="
+        width: 100%;
+        padding: 10px;
+        background: #0c3a5e;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+    ">
+      Reset Password
+    </button>
+
+    <p onclick="goToLogin()"
+      style="
+        cursor: pointer;
+        color: black;
+        margin-top: 15px;
+        font-size: 14px;
+        text-decoration: underline;
+    ">
+      Back to Login
+    </p>
+
+  </div>
+</div>
+<!-- ═══════════════════════════
+     RESULTS PAGE
+═══════════════════════════ -->
+<div id="results-page" class="page">
+  <div class="results-header">
+    <button class="btn-back" onclick="goToDashboard()">←</button>
+    <h2>Prediction <span>Result</span></h2>
+    <button class="btn-icon" onclick="goToLogin()">⏻</button>
+  </div>
+
+  <div class="results-body">
+    <div class="result-card card-score">
+      <h4>Overall Risk Score</h4>
+      <div class="gauge-wrap">
+        <svg class="gauge-svg" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs>
+            <linearGradient id="gGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#00d68f"/>
+              <stop offset="50%" stop-color="#ffb547"/>
+              <stop offset="100%" stop-color="#ff4d6d"/>
+            </linearGradient>
+          </defs>
+          <path d="M24 100 A76 76 0 0 1 176 100" stroke="rgba(255,255,255,0.07)" stroke-width="14" stroke-linecap="round" fill="none"/>
+          <path id="gauge-fill" d="M24 100 A76 76 0 0 1 176 100" stroke="url(#gGrad)" stroke-width="14" stroke-linecap="round" fill="none"
+            stroke-dasharray="238" stroke-dashoffset="238"
+            style="transition:stroke-dashoffset 1.3s cubic-bezier(.22,1,.36,1)"/>
+        </svg>
+        <div class="gauge-score" id="score-pct">--%</div>
+        <div class="gauge-label" id="score-label">Calculating…</div>
+      </div>
+    </div>
+
+    <div class="result-card card-breakdown">
+      <h4>Disease Breakdown</h4>
+      <div class="risk-pills">
+        <div class="risk-pill" id="heart-pill">
+          <div class="rp-icon">❤️</div>
+          <div class="rp-name">Heart Disease</div>
+          <div class="rp-pct" id="heart-pct">--%</div>
+          <span class="rp-tag" id="heart-tag">--</span>
+        </div>
+        <div class="risk-pill" id="diabetes-pill">
+          <div class="rp-icon">🩸</div>
+          <div class="rp-name">Diabetes</div>
+          <div class="rp-pct" id="diabetes-pct">--%</div>
+          <span class="rp-tag" id="diabetes-tag">--</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="result-card card-features">
+      <h4>Feature Importance</h4>
+      <div id="feat-bars"></div>
+    </div>
+
+    <div class="result-card card-recs">
+      <h4>Recommendations</h4>
+      <ul class="rec-list" id="rec-list"></ul>
+      <div class="result-actions">
+        <button class="btn-outline blue" onclick="goToDashboard()">📊 View Reports</button>
+        <button class="btn-outline red" onclick="window.print()">📄 Download PDF</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
