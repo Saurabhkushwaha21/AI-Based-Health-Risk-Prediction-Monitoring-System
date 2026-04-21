@@ -180,7 +180,3 @@ This project is licensed under the MIT License.
 
 **Saurabh Kushwaha**
 GitHub: https://github.com/Saurabhkushwaha21
-
----
-
-⭐ If you like this project, don't forget to give it a star!
