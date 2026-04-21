@@ -3,14 +3,15 @@ const BASE_URL = "https://ai-based-health-risk-prediction.onrender.com";
 
 function initApp() {
   console.log("App loaded ✅");
-   const savedUser = JSON.parse(localStorage.getItem("currentUser"));
 
-  if (savedUser) {
-    currentUser = savedUser;
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  if (user) {
+    currentUser = user;
     applyUserToUI();
-    showPage('dashboard-page');
+    showPage("dashboard-page");
   } else {
-    showPage('login-page');
+    showPage("login-page");
   }
 }
 
@@ -37,32 +38,16 @@ function goToDashboard() { closeSidebar(); showPage('dashboard-page'); }
 /* ═══════════════════════════
    AUTH — LOGIN
 ═══════════════════════════ */
-async function doLogin() {
-  const email = document.getElementById('login-email').value.trim().toLowerCase();
-  const password = document.getElementById('login-pass').value.trim();
+function doLogin() {
+  const email = document.getElementById("login-email").value;
+  const pass = document.getElementById("login-pass").value;
 
-  const res = await fetch(`${BASE_URL}/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password })
-  });
-
-  const data = await res.json();
-
-  if (!data.access_token) {
-    alert("Login failed ❌");
+  if (!email || !pass) {
+    alert("Fill all fields");
     return;
   }
 
-  localStorage.setItem("token", data.access_token);
-
-  const payload = JSON.parse(atob(data.access_token.split(".")[1]));
-
-  currentUser = { email: payload.email };
-
-  localStorage.setItem("currentUser", JSON.stringify(currentUser));
-
-  applyUserToUI();
+ localStorage.setItem("user", JSON.stringify({ email }));
   showPage("dashboard-page");
 }
 /* ═══════════════════════════
@@ -71,7 +56,7 @@ async function doLogin() {
 function logout() {
   currentUser = null;
 
-  localStorage.removeItem("currentUser");
+  localStorage.removeItem("user");
   
   document.getElementById('login-email').value = "";
   document.getElementById('login-pass').value = "";
@@ -85,28 +70,17 @@ function logout() {
 ═══════════════════════════ */
 function applyUserToUI() {
   if (!currentUser) return;
-  const fullName = `${currentUser.fname} ${currentUser.lname}`;
-  const initials = `${currentUser.fname[0]}${currentUser.lname[0]}`.toUpperCase();
 
-  setText('welcome-name',    currentUser.fname);
-  setText('topbar-username', fullName);
-  setText('sb-username',     fullName);
-  setText('sb-avatar',       initials);
+  const email = currentUser.email || "User";
+  const initials = email[0].toUpperCase();
 
-  // Profile section
-  setText('prof-name',    fullName);
-  setText('prof-email',   currentUser.email);
-  setText('prof-phone',   currentUser.phone   || '—');
-  setText('prof-gender',  currentUser.gender  || '—');
-  setText('prof-blood',   currentUser.blood   || '—');
-  setText('prof-dob',     currentUser.dob     || '—');
-  setText('prof-avatar',  initials);
-  setText('prof-tests',   testCount);
-}
+  setText('welcome-name', email);
+  setText('topbar-username', email);
+  setText('sb-username', email);
+  setText('sb-avatar', initials);
 
-function setText(id, val) {
-  const el = document.getElementById(id);
-  if (el) el.textContent = val;
+  setText('prof-email', email);
+  setText('prof-tests', testCount);
 }
 
 /* ═══════════════════════════
@@ -263,23 +237,19 @@ async function predictRisk() {
   let result;
 console.log("Sending data:", data);
 try {
- const token = localStorage.getItem("token");
-
-const response = await fetch(`${BASE_URL}/predict`, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    "Authorization": "Bearer " + token
-  },
-  body: JSON.stringify(data)
-  });
-
+ const response = await fetch(`${BASE_URL}/predict`, {
+    method: "POST",
+    headers: {
+    "Content-Type": "application/json"
+   },
+    body: JSON.stringify(data)
+   });
+  
   if (!response.ok) {
     throw new Error("API failed");
   }
 
   result = await response.json(); 
-  const token = localStorage.getItem("token");
 
   if (!token) {
   alert("Login required ❌");
@@ -435,12 +405,7 @@ function riskClass(pct) {
 ═══════════════════════════ */
 async function loadHistory() {
   try {
-    const token = localStorage.getItem("token");
-    const res = await fetch(`${BASE_URL}/history`, {
-  headers: {
-    "Authorization": "Bearer " + token
-  }
-});
+    const res = await fetch(`${BASE_URL}/history`);
     const data = await res.json();
     window.historyData = data;
     console.log("History:", data);
