@@ -281,7 +281,7 @@ async function predictRisk() {
   let result;
 console.log("Sending data:", data);
 try {
-  const response = await fetch("http://127.0.0.1:8001/predict", {
+  const response = await fetch("https://ai-based-health-risk-prediction.onrender.com/predict", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data)
@@ -443,7 +443,7 @@ function riskClass(pct) {
 ═══════════════════════════ */
 async function loadHistory() {
   try {
-    const res = await fetch("http://127.0.0.1:8001/history")
+    const res = await fetch("https://ai-based-health-risk-prediction.onrender.com/history")
     const data = await res.json();
     window.historyData = data;
     console.log("History:", data);
@@ -494,7 +494,7 @@ function viewHistory(id) {
 }
 /*delete history*/
 async function deleteHistory(id) {
-  await fetch(`http://127.0.0.1:8001/delete/${id}`, {
+  await fetch(`https://ai-based-health-risk-prediction.onrender.com/delete/${id}`, {
     method: "DELETE"
   });
 
