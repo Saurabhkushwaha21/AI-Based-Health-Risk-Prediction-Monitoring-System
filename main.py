@@ -68,7 +68,7 @@ async def audit_logging_middleware(request, call_next):
 # =========================
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Production ke waqt yahan apna Netlify URL daliyega
+    allow_origins=["https://ai-based-health-risk-prediction.netlify.app"],  # Production ke waqt yahan apna Netlify URL daliyega
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
