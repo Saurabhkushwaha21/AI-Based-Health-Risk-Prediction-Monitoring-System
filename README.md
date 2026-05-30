@@ -44,7 +44,6 @@ The system uses trained Machine Learning models to:
 * HTML5
 * CSS3
 * JavaScript
-* Bootstrap / Tailwind CSS
 
 ## Backend
 
@@ -56,7 +55,7 @@ The system uses trained Machine Learning models to:
 
 ## Database
 
-* SQLite / PostgreSQL
+* MYSQL
 
 ## Machine Learning
 
