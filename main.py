@@ -1,6 +1,6 @@
 import json
 import logging
-import time
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import Depends, FastAPI, HTTPException, status
@@ -14,15 +14,12 @@ from prediction import final_health_prediction, load_ml_models
 from preprocessing import hash_password, verify_password
 from schema import HealthInput
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger("health_api")
 
 ALLOWED_ORIGINS = [
     origin.strip()
-    for origin in __import__("os").getenv("CORS_ORIGINS", "https://ai-based-health-risk-prediction.netlify.app").split(",")
+    for origin in os.getenv("CORS_ORIGINS", "https://ai-based-health-risk-prediction.netlify.app").split(",")
     if origin.strip()
 ]
 
@@ -36,12 +33,7 @@ async def lifespan(app: FastAPI):
     logger.info("Health prediction API stopped.")
 
 
-app = FastAPI(
-    title="AI-Based Health Risk Prediction API",
-    version="1.1.0",
-    lifespan=lifespan,
-)
-
+app = FastAPI(title="AI-Based Health Risk Prediction API", version="1.1.0", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
@@ -63,14 +55,11 @@ async def home():
 
 @app.post("/api/v1/auth/signup", status_code=status.HTTP_201_CREATED)
 async def signup(user_data: UserAuthSchema, db: Session = Depends(get_db)):
-    existing_user = db.query(User).filter(User.email == user_data.email).first()
-    if existing_user:
+    email = str(user_data.email).lower().strip()
+    if db.query(User).filter(User.email == email).first():
         raise HTTPException(status_code=409, detail="Email is already registered.")
 
-    user = User(
-        email=user_data.email,
-        password=hash_password(user_data.password),
-    )
+    user = User(email=email, password=hash_password(user_data.password))
     db.add(user)
     db.commit()
     db.refresh(user)
@@ -79,9 +68,15 @@ async def signup(user_data: UserAuthSchema, db: Session = Depends(get_db)):
 
 @app.post("/api/v1/auth/login", status_code=status.HTTP_200_OK)
 async def login(user_data: UserAuthSchema, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == user_data.email).first()
+    email = str(user_data.email).lower().strip()
+    user = db.query(User).filter(User.email == email).first()
     if not user or not verify_password(user_data.password, user.password):
         raise HTTPException(status_code=401, detail="Invalid email or password.")
+
+    # Transparently upgrade legacy SHA-256 credentials after a successful login.
+    if not user.password.startswith(("$2b$", "$2a$", "$2y$")):
+        user.password = hash_password(user_data.password)
+        db.commit()
 
     access_token = create_access_token({"sub": user.email})
     return {"access_token": access_token, "token_type": "bearer", "email": user.email}
@@ -99,7 +94,6 @@ async def predict(
             "heart_features": data.heart_features.model_dump(),
         }
         result = final_health_prediction(input_data)
-
         new_entry = Prediction(
             user_id=current_user.id,
             diabetes_risk=float(result.get("Diabetes_Risk (%)", 0)),
@@ -116,17 +110,11 @@ async def predict(
     except Exception as exc:
         db.rollback()
         logger.exception("Prediction request failed: %s", exc)
-        raise HTTPException(
-            status_code=500,
-            detail="Prediction service temporarily unavailable.",
-        ) from exc
+        raise HTTPException(status_code=500, detail="Prediction service temporarily unavailable.") from exc
 
 
 @app.get("/history", status_code=status.HTTP_200_OK)
-async def get_history(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-):
+async def get_history(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     try:
         records = (
             db.query(Prediction)
@@ -158,13 +146,9 @@ async def delete_prediction(
 ):
     record = (
         db.query(Prediction)
-        .filter(
-            Prediction.id == prediction_id,
-            Prediction.user_id == current_user.id,
-        )
+        .filter(Prediction.id == prediction_id, Prediction.user_id == current_user.id)
         .first()
     )
-
     if record is None:
         raise HTTPException(status_code=404, detail="Prediction not found.")
 
