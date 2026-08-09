@@ -1,4 +1,4 @@
-﻿fastapi
+fastapi
 uvicorn
 sqlalchemy
 pydantic
@@ -6,3 +6,5 @@ numpy
 pandas
 scikit-learn
 python-jose
+bcrypt
+email-validator
