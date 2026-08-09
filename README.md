@@ -1,294 +1,234 @@
-# AI-Based Health Risk Prediction & Monitoring System
+# 🩺 AI-Based Health Risk Prediction & Monitoring System
 
-## Overview
+> A full-stack machine-learning project that connects health-data input, disease-risk prediction, authenticated APIs, and prediction history.
 
-AI-Based Health Risk Prediction & Monitoring System is a full-stack healthcare intelligence platform designed to predict potential health risks using Machine Learning models. The system analyzes user health parameters and provides real-time disease risk predictions for conditions such as Diabetes and Heart Disease.
+## Why I Built This
 
-The platform combines Artificial Intelligence, FastAPI backend services, secure authentication, and interactive dashboards to deliver an efficient and scalable healthcare monitoring solution.
+I built this project to understand how a machine-learning model can be integrated into a usable software application. Instead of keeping prediction code separate, the project connects the ML workflow with a FastAPI backend, database persistence, authentication, and a browser-based frontend.
 
----
+## Key Features
 
-# Features
+- 🤖 Diabetes and heart-disease risk prediction workflows
+- 📈 Risk probability/output presentation
+- 🔐 JWT-based authentication and protected APIs
+- 👤 User-specific prediction history
+- 🗄️ MySQL persistence through SQLAlchemy
+- 🌐 REST API built with FastAPI
+- 🖥️ HTML/CSS/JavaScript frontend
+- ✅ Input validation with Pydantic
+- 🧪 Backend testing and API validation
 
-## Core Functionalities
+## Tech Stack
 
-* AI-powered disease risk prediction
-* Real-time health analysis
-* Secure user authentication and authorization
-* Prediction history tracking
-* REST API integration
-* Interactive and responsive frontend
-* Fast and scalable backend architecture
-* Machine Learning model integration
-* Health monitoring dashboard
-* User-friendly UI/UX
+| Layer | Technologies |
+|---|---|
+| Frontend | HTML5, CSS3, JavaScript |
+| Backend | Python, FastAPI, SQLAlchemy, Pydantic, Uvicorn |
+| Database | MySQL |
+| Machine Learning | Scikit-learn, Pandas, NumPy |
+| Authentication | JWT, password hashing |
 
----
-
-# Machine Learning Capabilities
-
-The system uses trained Machine Learning models to:
-
-* Predict Diabetes Risk
-* Predict Heart Disease Risk
-* Analyze health parameters
-* Generate risk probability scores
-* Provide instant prediction responses
-
----
-
-# Tech Stack
-
-## Frontend
-
-* HTML5
-* CSS3
-* JavaScript
-
-## Backend
-
-* Python
-* FastAPI
-* SQLAlchemy
-* Pydantic
-* Uvicorn
-
-## Database
-
-* MYSQL
-
-## Machine Learning
-
-* Scikit-learn
-* Pandas
-* NumPy
-
-## Deployment
-
-* Netlify (Frontend)
-* Render / Railway / AWS / Docker (Backend)
-
----
-
-# System Architecture
+## Architecture
 
 ```text
-Frontend (HTML/CSS/JS)
-        ↓
-REST API Communication
-        ↓
+Browser UI
+    │
+    ▼
+HTML / CSS / JavaScript
+    │
+    │ REST API
+    ▼
 FastAPI Backend
-        ↓
-ML Prediction Engine
-        ↓
-Database Storage
+    │
+ ┌──┴───────────────┐
+ ▼                  ▼
+Authentication   ML Prediction
+ │                  │
+ ▼                  ▼
+MySQL          Trained Models
+ │
+ ▼
+Prediction History
 ```
 
----
-
-# API Features
-
-* User Registration API
-* Login Authentication API
-* Disease Prediction API
-* User History API
-* Health Data Management API
-
----
-
-# Project Structure
+## Machine Learning Workflow
 
 ```text
-AI-Based-Health-Risk-Prediction-Monitoring-System/
-│
-├── backend/
-│   ├── app/
-│   ├── models/
-│   ├── routes/
-│   ├── services/
-│   ├── database/
-│   ├── ml_models/
-│   ├── main.py
-│   └── requirements.txt
-│
-├── frontend/
-│   ├── index.html
-│   ├── css/
-│   ├── js/
-│   └── assets/
-│
+User Health Parameters
+          │
+          ▼
+Input Validation
+          │
+          ▼
+Preprocessing
+          │
+          ▼
+Trained ML Model
+          │
+          ▼
+Risk Prediction
+          │
+          ▼
+Authenticated History
+```
+
+The repository contains ML models/workflows for health-risk prediction. Model quality should be evaluated against the actual dataset and evaluation code; this README intentionally does not claim unsupported accuracy numbers.
+
+## Authentication & Authorization
+
+The application uses backend authentication rather than treating browser-side state as the source of truth.
+
+- Passwords are hashed before storage.
+- JWTs protect authenticated API operations.
+- Prediction history is scoped to the authenticated user.
+- Users cannot access another user's prediction records through the API.
+- Protected delete/history operations enforce ownership.
+- Secrets are configured through environment variables rather than committed credentials.
+
+## API Capabilities
+
+The backend provides functionality around:
+
+- User registration
+- User login
+- Authenticated prediction requests
+- Prediction history
+- User-owned prediction management
+
+Run the backend and use FastAPI's interactive documentation to inspect the exact current routes and request/response schemas.
+
+## Project Structure
+
+```text
+.
+├── backend/          # FastAPI app, auth, database and ML integration
+├── frontend/         # HTML/CSS/JavaScript UI
+├── .github/          # CI/test automation where configured
 ├── README.md
 └── .gitignore
 ```
 
----
+## Run Locally
 
-# Installation Guide
-
-## Clone Repository
-
-```bash
-git clone https://github.com/Saurabhkushwaha21/AI-Based-Health-Risk-Prediction-Monitoring-System.git
-```
-
-## Navigate to Project
-
-```bash
-cd AI-Based-Health-Risk-Prediction-Monitoring-System
-```
-
-## Create Virtual Environment
-
-```bash
-python -m venv venv
-```
-
-## Activate Environment
+Create and activate a virtual environment:
 
 ### Windows
 
 ```bash
+python -m venv venv
 venv\Scripts\activate
 ```
 
-### Linux / Mac
+### Linux/macOS
 
 ```bash
+python -m venv venv
 source venv/bin/activate
 ```
 
-## Install Dependencies
+Install backend dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## Run Backend Server
+Configure the required environment variables using the repository's example configuration. Never commit real database credentials or JWT secrets.
+
+Start the backend with the project's FastAPI entry point, for example:
 
 ```bash
 uvicorn main:app --reload
 ```
 
----
+When running, FastAPI exposes interactive API documentation at `/docs` if enabled by the application configuration.
 
-# Environment Variables
+Open the frontend from the repository's frontend files using the development setup documented by the project.
 
-Create a `.env` file:
+## Testing
 
-```env
-DATABASE_URL=your_database_url
-SECRET_KEY=your_secret_key
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
+The project should be validated at both API and application levels. Typical backend testing command:
+
+```bash
+pytest
 ```
 
----
+Security-sensitive tests cover areas such as:
 
-# Future Enhancements
+- Authentication
+- Invalid credentials
+- Protected prediction requests
+- Prediction ownership
+- History access
+- Delete authorization
+- Request validation
 
-* AI-based symptom checker
-* Voice-enabled virtual health assistant
-* Real-time patient monitoring
-* Wearable device integration
-* Emotion-aware disease prediction
-* Gut microbiome analysis integration
-* Cloud deployment scalability
-* Advanced analytics dashboard
+## Security
 
----
+- JWT authentication
+- Password hashing
+- Protected API routes
+- User ownership checks
+- Pydantic request validation
+- Environment-based secrets
+- Safe API error handling
+- Database transaction handling on failures
 
-# Performance Highlights
+## Screenshots
 
-* Optimized FastAPI backend for high performance
-* Scalable REST API architecture
-* Secure authentication workflow
-* Responsive frontend design
-* Efficient ML model integration
-* Clean modular project structure
+The repository includes application screenshots demonstrating the current UI.
 
----
+For a portfolio presentation, keep screenshots focused on:
 
-# Use Cases
+- Login / registration
+- Prediction form
+- Prediction result
+- User history/dashboard
 
-* Healthcare Monitoring
-* Disease Risk Assessment
-* Preventive Healthcare Systems
-* AI-based Medical Assistance
-* Health Analytics Platforms
-* Smart Healthcare Applications
+## Medical Disclaimer
 
----
+**This project is an educational machine-learning application and is not a medical diagnostic tool.** Predictions are model outputs and should not be used as a substitute for professional medical advice, diagnosis, or treatment.
 
-# Security Features
+## Engineering Challenges
 
-* JWT Authentication
-* Password Hashing
-* Secure API Access
-* Input Validation using Pydantic
-* Database Security Practices
+This project gave me practical experience with:
 
----
+- Integrating ML inference into a REST API
+- Designing authenticated prediction workflows
+- Persisting user-specific prediction history
+- Enforcing authorization and ownership
+- Validating ML inputs before inference
+- Connecting a browser frontend with FastAPI
+- Testing security-sensitive API behavior
 
-# Screenshots
-<img width="1891" height="910" alt="Screenshot 2026-04-21 230620" src="https://github.com/user-attachments/assets/849d7b23-d210-4163-8d5a-7d940ed98640" />
-<img width="1883" height="906" alt="Screenshot 2026-04-21 230734" src="https://github.com/user-attachments/assets/baca5f3e-2228-4d09-b884-b1641cba61b5" />
-<img width="1867" height="901" alt="Screenshot 2026-04-21 230900" src="https://github.com/user-attachments/assets/b0d8ab13-a54c-4c3e-b07f-7c2d6da6c1aa" />
+## Known Limitations
 
+This is a portfolio/learning project. Prediction quality depends on the training data and model evaluation. The application should not be presented as clinically validated software.
 
-```text
-assets/screenshots/
-```
+## Future Improvements
 
----
+- Add stronger model evaluation and experiment tracking
+- Expand the supported conditions/models
+- Add explainability such as feature importance where appropriate
+- Improve automated integration/security coverage
+- Add richer monitoring and model-version management
+- Add production-grade deployment and observability
 
-# Deployment
+## Resume Highlights
 
-## Frontend Deployment
+- Built a full-stack health-risk prediction application integrating Scikit-learn models with FastAPI and MySQL.
+- Implemented JWT authentication and user-owned prediction history.
+- Connected a browser-based frontend to authenticated ML prediction APIs.
+- Added input validation and security-focused API tests.
 
-Deploy frontend using:
+## Author
 
-* Netlify
-* Vercel
+**Saurabh Kushwaha**  
+B.Tech — Artificial Intelligence & Machine Learning
 
-## Backend Deployment
+GitHub: [Saurabhkushwaha21](https://github.com/Saurabhkushwaha21)
 
-Deploy backend using:
-
-* Render
-* Railway
-* AWS
-* Docker
-
----
-
-# Author
-
-## Saurabh Kushwaha
-* Full Stack Developer
-
-GitHub: [https://github.com/Saurabhkushwaha21](https://github.com/Saurabhkushwaha21)
-
-LinkedIn: [https://www.linkedin.com/in/saurabh-kushwaha-8b7a56293/](https://www.linkedin.com/in/saurabh-kushwaha-8b7a56293/)
+LinkedIn: [Saurabh Kushwaha](https://www.linkedin.com/in/saurabh-kushwaha-8b7a56293/)
 
 ---
 
-# Resume Highlights
-
-* Developed AI-powered disease prediction platform
-* Built scalable FastAPI REST APIs
-* Integrated Machine Learning models with backend
-* Designed secure authentication system
-* Created responsive frontend architecture
-* Implemented real-time health prediction workflows
-
----
-
-# License
-
-This project is licensed under the MIT License.
-
----
-
-# Conclusion
-
-AI-Based Health Risk Prediction & Monitoring System demonstrates the practical implementation of Artificial Intelligence in healthcare technology. The project showcases Full Stack Development, Machine Learning Integration, REST API Development, Authentication Systems, and Scalable Software Architecture suitable for real-world healthcare applications.
+⭐ This repository is maintained as a portfolio project demonstrating practical machine-learning integration and software engineering skills.
